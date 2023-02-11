@@ -19,25 +19,25 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("select s from Student s order by s.nume desc ")
     Optional<List<Student>> getStudentsOrderByNameDesc();
 
-    Optional<Student> findStudentByEmail();
+    Optional<Student> findStudentByEmail(String email);
 
     @Transactional
-    Optional<Student> readStudentByEmail();
+    Optional<Student> removeStudentByEmail(String email);
 
     @Transactional
     @Modifying
     @Query("update Student s set s.email = ?1 where s.email = ?2")
-    Optional<Student> updateStudentEmail();
+    Optional<Student> updateStudentEmail(String emailNou, String email);
 
     @Transactional
     @Modifying
     @Query("update Student s set s.nume = ?1 where s.nume = ?2")
-    Optional<Student> updateStudentNume();
+    Optional<Student> updateStudentNume(String nume, String email);
 
     @Transactional
     @Modifying
     @Query("update Student s set s.parola = ?1 where s.parola = ?2")
-    Optional<Student> updateStudentParola();
+    Optional<Student> updateStudentParola(String parola, String email);
 
 
 }
