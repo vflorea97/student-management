@@ -16,7 +16,7 @@ public class StudentManagementApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(View view){
 		return args -> {
-		view.play();
+//		view.play();
 		};
 	}
 
