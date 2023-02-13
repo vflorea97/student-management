@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -15,14 +17,29 @@ import javax.persistence.*;
 @Table(schema = "studenti")
 public class Student implements Comparable<Student> {
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     @Id
+    @SequenceGenerator(name = "student_sequence", sequenceName = "student_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
 
     private Long id;
+
+    @Column(name = "nume", nullable = false)
     private String nume;
+
+    @Column(name = "prenume", nullable = false)
     private String prenume;
+
+    @Column(name = "email", nullable = false)
+    @Size(min = 10,message = "Emailul trebue sa fie de minim 10 caractere")
     private String email;
+
+    @Column(name = "varsta", nullable = false)
+    @Max(value = 50, message = "Persoanele care se inscriu trebuie sa aiba maxim 50 de ani")
     private int varsta;
+
+    @Column(name = "parola")
+    @Size(min = 6, message = "Parola trebuie sa fie de minim 6 caractere")
     private String parola;
 
     @Override
