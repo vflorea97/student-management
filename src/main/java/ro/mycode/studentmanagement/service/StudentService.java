@@ -1,7 +1,9 @@
 package ro.mycode.studentmanagement.service;
 
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
+import ro.mycode.studentmanagement.dto.StudentDTO;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentDBEmpty;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentExisten;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentNeexistent;
@@ -19,6 +21,7 @@ public class StudentService {
 
     public StudentService(StudentRepository studentRepository){
         this.studentRepository = studentRepository;
+
     }
 
     public List<Student> gelAllStudents(){
@@ -104,5 +107,29 @@ public class StudentService {
         }else{
             throw new ExceptieStudentNeexistent();
         }
+    }
+
+    @Transactional
+    @Modifying
+    public void updateStudent(StudentDTO studentDTO) throws ExceptieStudentNeexistent{
+
+        Optional<Student> student = studentRepository.findById(studentDTO.getId());
+        if (student.isPresent()){
+            Student s = student.get();
+
+            if (!studentDTO.getEmail().equals("")){
+                s.setEmail(studentDTO.getEmail());
+            }
+            if (!studentDTO.getName().equals("")){
+                s.setNume(studentDTO.getName());
+            }
+            if (!studentDTO.getParola().equals("")){
+                s.setParola(studentDTO.getParola());
+            }
+            studentRepository.saveAndFlush(s);
+        }else {
+            throw new ExceptieStudentNeexistent();
+        }
+
     }
 }
