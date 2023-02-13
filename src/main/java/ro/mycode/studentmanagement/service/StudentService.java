@@ -120,8 +120,8 @@ public class StudentService {
             if (!studentDTO.getEmail().equals("")){
                 s.setEmail(studentDTO.getEmail());
             }
-            if (!studentDTO.getName().equals("")){
-                s.setNume(studentDTO.getName());
+            if (!studentDTO.getNume().equals("")){
+                s.setNume(studentDTO.getNume());
             }
             if (!studentDTO.getParola().equals("")){
                 s.setParola(studentDTO.getParola());
