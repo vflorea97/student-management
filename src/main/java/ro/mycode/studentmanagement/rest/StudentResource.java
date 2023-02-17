@@ -63,6 +63,13 @@ public class StudentResource {
         return new ResponseEntity<>(student, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("api/v1/student/remove")
+    public ResponseEntity<String> removeStudent( @RequestParam String email){
+        log.info("REST request to remove one student");
+        studentService.removeStudent(email);
+        return new ResponseEntity<>("Ai sters cu succes un student", HttpStatus.OK);
+    }
+
     @PutMapping("api/v1/student/update")
     public ResponseEntity<String> updateStudent(@Valid @RequestBody StudentDTO studentDTO){
         log.info("REST request to update student{}", studentDTO);
