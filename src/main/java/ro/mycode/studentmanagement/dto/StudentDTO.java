@@ -12,7 +12,7 @@ public class StudentDTO {
 
     @NotNull
     private Long id;
-    private String name = "";
+    private String nume = "";
     private String email = "";
     private String parola = "";
 }
