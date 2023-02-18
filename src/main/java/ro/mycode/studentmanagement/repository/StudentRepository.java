@@ -27,17 +27,17 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Transactional
     @Modifying
     @Query("update Student s set s.email = ?1 where s.email = ?2")
-    Optional<Student> updateStudentEmail(String emailNou, String email);
+    void updateStudentEmail(String emailNou, String email);
 
     @Transactional
     @Modifying
     @Query("update Student s set s.nume = ?1 where s.nume = ?2")
-    Optional<Student> updateStudentNume(String nume, String email);
+    void updateStudentNume(String nume, String email);
 
     @Transactional
     @Modifying
     @Query("update Student s set s.parola = ?1 where s.parola = ?2")
-    Optional<Student> updateStudentParola(String parola, String email);
+    void updateStudentParola(String parola, String email);
 
 
 }
