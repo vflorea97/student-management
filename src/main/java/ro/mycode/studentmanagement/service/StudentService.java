@@ -28,9 +28,8 @@ public class StudentService {
         List<Student> students = studentRepository.findAll();
         if (students.size() > 0) {
             return students;
-        }else {
-            throw new ExceptieStudentDBEmpty();
         }
+        throw new ExceptieStudentDBEmpty();
     }
 
     public Optional<Student> getStudentByEmail(String email) throws ExceptieStudentNeexistent{
