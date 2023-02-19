@@ -24,9 +24,13 @@ public class StudentService {
 
     }
 
-    public List<Student> gelAllStudents(){
+    public List<Student> gelAllStudents() throws ExceptieStudentDBEmpty{
         List<Student> students = studentRepository.findAll();
-        return students;
+        if (students.size() > 0) {
+            return students;
+        }else {
+            throw new ExceptieStudentDBEmpty();
+        }
     }
 
     public Optional<Student> getStudentByEmail(String email) throws ExceptieStudentNeexistent{

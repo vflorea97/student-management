@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ro.mycode.studentmanagement.StudentManagementApplication;
 import ro.mycode.studentmanagement.model.Student;
@@ -120,18 +118,35 @@ class StudentRepositoryTest {
     public void updateStudentEmail() {
         Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
 
+
         studentRepository.saveAndFlush(student);
 
         studentRepository.updateStudentEmail("pocopcpocpoc","dsadas@dasd.com");
 
-        List<Student> students = studentRepository.getStudentsOrderByNameAsc().get();
-
-        assertEquals("pocopcpocpoc", students.get(0).getEmail());
-
+        assertNotEquals(Optional.empty(),studentRepository.findStudentByEmail("pocopcpocpoc"));
+        assertEquals(Optional.empty(),studentRepository.findStudentByEmail("dsadas@dasd.com"));
     }
 
+    @Test
+    public void updateStudentNume() {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
 
+        studentRepository.saveAndFlush(student);
 
+        studentRepository.updateStudentNume("Ionut","dsadas@dasd.com");
 
+        assertNotEquals(Optional.empty(), studentRepository.findStudentByEmailAndNume("dsadas@dasd.com","Ionut" ));
+    }
 
+    @Test
+    public void updateStudentParola(){
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
+
+        studentRepository.saveAndFlush(student);
+
+        studentRepository.updateStudentParola("POCPOC12", "dsadas@dasd.com");
+
+        assertNotEquals(Optional.empty(), studentRepository.findStudentByEmailAndParola("dsadas@dasd.com", "POCPOC12"));
+
+    }
 }
