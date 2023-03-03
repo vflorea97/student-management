@@ -20,6 +20,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<List<Student>> getStudentsOrderByNameDesc();
 
     Optional<Student> findStudentByEmail(String email);
+    Optional<Student> findStudentByEmailAndNume(String email, String nume);
+    Optional<Student> findStudentByEmailAndParola(String email, String parola);
 
     @Transactional
     Optional<Student> removeStudentByEmail(String email);
@@ -31,12 +33,12 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Transactional
     @Modifying
-    @Query("update Student s set s.nume = ?1 where s.nume = ?2")
+    @Query("update Student s set s.nume = ?1 where s.email = ?2")
     void updateStudentNume(String nume, String email);
 
     @Transactional
     @Modifying
-    @Query("update Student s set s.parola = ?1 where s.parola = ?2")
+    @Query("update Student s set s.parola = ?1 where s.email = ?2")
     void updateStudentParola(String parola, String email);
 
 
