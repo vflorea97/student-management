@@ -36,9 +36,8 @@ public class StudentService {
         Optional<Student> student = studentRepository.findStudentByEmail(email);
         if (student.isPresent()){
             return student;
-        }else {
-            throw new ExceptieStudentNeexistent();
         }
+        throw new ExceptieStudentNeexistent();
     }
 
     @Transactional

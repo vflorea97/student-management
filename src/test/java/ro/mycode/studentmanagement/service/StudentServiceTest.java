@@ -2,10 +2,13 @@ package ro.mycode.studentmanagement.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentDBEmpty;
+import ro.mycode.studentmanagement.exceptii.ExceptieStudentExisten;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentNeexistent;
 import ro.mycode.studentmanagement.model.Student;
 import ro.mycode.studentmanagement.repository.StudentRepository;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -25,6 +28,9 @@ class StudentServiceTest {
 
     @InjectMocks
     private StudentService studentService;
+
+    @Captor
+    ArgumentCaptor<Student> studentArgumentCaptor;
 
 
     @Test
@@ -46,8 +52,6 @@ class StudentServiceTest {
         doReturn(students).when(studentRepository).findAll();
 
         assertEquals(5,studentService.gelAllStudents().size());
-
-
     }
 
     @Test
@@ -63,18 +67,46 @@ class StudentServiceTest {
     public void getStudentByEmail() {
         Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
 
-        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("ddasdan@gamil.ro");
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("ddasdangamil.ro");
 
-        assertEquals(Optional.of(student), studentService.getStudentByEmail("ddasdan@gamil.ro"));
+        assertEquals(Optional.of(student), studentService.getStudentByEmail("ddasdangamil.ro"));
     }
 
     @Test
-    public void getStudentByEmailEmpty() {
-        doReturn().when(studentRepository).findStudentByEmail("dsadas@dasd.com");
+    public void getStudentByEmailException() {
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("dsadasdasd.com");
         assertThrows(ExceptieStudentNeexistent.class, () -> {
-            studentService.getStudentByEmail("dsadas@dasd.com");
+            studentService.getStudentByEmail("dsadasdasd.com");
         });
     }
+
+    @Test
+    public void addStudent(){
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        studentService.addStudent(student);
+
+        verify(studentRepository,times(1)).saveAndFlush(studentArgumentCaptor.capture());
+
+        assertEquals(studentArgumentCaptor.getValue(),student);
+    }
+
+    @Test
+    public void addStudentExceptie(){
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
+        
+        verify(studentRepository,times(1)).sa
+
+        assertThrows(ExceptieStudentExisten.class, () ->{
+            studentService.addStudent(student);
+        });
+    }
+
+
 
 
 }
