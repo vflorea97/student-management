@@ -43,7 +43,7 @@ public class StudentService {
     @Transactional
     public void addStudent(Student student) throws ExceptieStudentExisten {
         Optional<Student> student1 = studentRepository.findStudentByEmail(student.getEmail());
-        if (student1.equals(Optional.empty())){
+        if (student1.isEmpty()){
             studentRepository.saveAndFlush(student);
         }else{
             throw new ExceptieStudentExisten();
@@ -94,7 +94,7 @@ public class StudentService {
     public void updateStudentNume(String nume, String email) throws ExceptieStudentNeexistent{
         Optional<Student> student = studentRepository.findStudentByEmail(email);
         if (student.isPresent()){
-            studentRepository.updateStudentEmail(nume, email);
+            studentRepository.updateStudentNume(nume, email);
         }else{
             throw new ExceptieStudentNeexistent();
         }
@@ -105,7 +105,7 @@ public class StudentService {
     public void updateStudentParola(String parola, String email) throws ExceptieStudentNeexistent{
         Optional<Student> student = studentRepository.findStudentByEmail(email);
         if (student.isPresent()){
-            studentRepository.updateStudentEmail(parola, email);
+            studentRepository.updateStudentParola(parola, email);
         }else{
             throw new ExceptieStudentNeexistent();
         }
