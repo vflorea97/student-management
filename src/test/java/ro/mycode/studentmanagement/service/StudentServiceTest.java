@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ro.mycode.studentmanagement.comparatori.StudentComparatorNumeDesc;
+import ro.mycode.studentmanagement.dto.StudentDTO;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentDBEmpty;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentExisten;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentNeexistent;
@@ -31,7 +32,10 @@ class StudentServiceTest {
     @Captor
     ArgumentCaptor<Student> studentArgumentCaptor;
     @Captor
-    ArgumentCaptor<String> studentField;
+    ArgumentCaptor<String> studentField1;
+    @Captor
+    ArgumentCaptor<String> studentField2;
+
 
 
     @Test
@@ -110,9 +114,9 @@ class StudentServiceTest {
 
         studentService.removeStudent("test@gmail.com");
 
-        verify(studentRepository,times(1)).removeStudentByEmail(studentField.capture());
+        verify(studentRepository,times(1)).removeStudentByEmail(studentField1.capture());
 
-        assertEquals("test@gmail.com",studentField.getValue());
+        assertEquals("test@gmail.com",studentField1.getValue());
     }
     @Test
     public void removeStudentExceptie() {
@@ -194,17 +198,94 @@ class StudentServiceTest {
 
     @Test
     public void updateStudentEmail() {
+       //todo:mock
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("vechi@test.com");
+
+        studentService.updateStudentEmail("test@gmail.com","vechi@test.com");
+        verify(studentRepository,times(1)).updateStudentEmail(studentField1.capture(),studentField2.capture());
+
+
+        assertEquals("test@gmail.com",studentField1.getValue());
+        assertEquals("vechi@test.com",studentField2.getValue());
+    }
+
+    @Test
+    public void updateStudentEmailExceptie() {
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        assertThrows(ExceptieStudentNeexistent.class, () ->{
+            studentService.updateStudentEmail("nou@gmail.com","test@gmail.com");
+        });
+    }
+
+    @Test
+    public void updateStudentNume() {
         Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
 
-        doReturn(Optional.ofNullable(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
 
-//        studentService.updateStudentEmail("pocpoc","test@gmail.com");
-        studentRepository.updateStudentEmail("pocpoc","test@gmail.com");
+        studentService.updateStudentNume("Soptaru","test@gmail.com");
 
-        verify(studentRepository).saveAndFlush(studentArgumentCaptor.capture());
+        verify(studentRepository, times(1)).updateStudentNume(studentField1.capture(), studentField2.capture());
 
-        verify(studentRepository).save(studentArgumentCaptor.capture());
+        assertEquals("Soptaru",studentField1.getValue());
+        assertEquals("test@gmail.com",studentField2.getValue());
 
-        assertEquals(studentArgumentCaptor.getValue().getEmail(),student.getEmail());
+    }
+
+    @Test
+    public void updateStudentNumeExceptie() {
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        assertThrows(ExceptieStudentNeexistent.class, () ->{
+            studentService.updateStudentNume("Soptaru","test@gmail.com");
+        });
+    }
+
+    @Test
+    public void updateStudentParola() {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        studentService.updateStudentParola("pocpoc12","test@gmail.com");
+
+        verify(studentRepository, times(1)).updateStudentParola(studentField1.capture(), studentField2.capture());
+
+        assertEquals("pocpoc12",studentField1.getValue());
+        assertEquals("test@gmail.com",studentField2.getValue());
+    }
+
+    @Test
+    public void updateStudentParolaExceptie() {
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("test@gmail.com");
+        assertThrows(ExceptieStudentNeexistent.class, () ->{
+            studentService.updateStudentParola("pocpoc12","test@gmail.com");
+        });
+    }
+
+    @Test
+    public void updateStudentDTO() {
+        StudentDTO studentDTO = new StudentDTO(1L,"Popa","popa@gmail.com","pocpoc12");
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.of(student)).when(studentRepository).findById(studentDTO.getId());
+
+        studentService.updateStudent(studentDTO);
+
+        verify(studentRepository, times(1)).saveAndFlush(studentArgumentCaptor.capture());
+
+        assertEquals(student,studentArgumentCaptor.getValue());
+
+    }
+
+    @Test
+    public void updateStudentDTOExceptie() {
+        StudentDTO studentDTO = new StudentDTO(1L,"Popa","popa@gmail.com","pocpoc12");
+        doReturn(Optional.empty()).when(studentRepository).findById(1L);
+        assertThrows(ExceptieStudentNeexistent.class, () ->{
+           studentService.updateStudent(studentDTO);
+        });
     }
 }
