@@ -7,15 +7,14 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ro.mycode.studentmanagement.comparatori.StudentComparatorNumeDesc;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentDBEmpty;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentExisten;
 import ro.mycode.studentmanagement.exceptii.ExceptieStudentNeexistent;
 import ro.mycode.studentmanagement.model.Student;
 import ro.mycode.studentmanagement.repository.StudentRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,6 +30,8 @@ class StudentServiceTest {
 
     @Captor
     ArgumentCaptor<Student> studentArgumentCaptor;
+    @Captor
+    ArgumentCaptor<String> studentField;
 
 
     @Test
@@ -53,7 +54,6 @@ class StudentServiceTest {
 
         assertEquals(5,studentService.gelAllStudents().size());
     }
-
     @Test
     public  void getAllStudentsEmpty(){
         List<Student> students = new ArrayList<>();
@@ -71,7 +71,6 @@ class StudentServiceTest {
 
         assertEquals(Optional.of(student), studentService.getStudentByEmail("ddasdangamil.ro"));
     }
-
     @Test
     public void getStudentByEmailException() {
         doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("dsadasdasd.com");
@@ -92,21 +91,120 @@ class StudentServiceTest {
 
         assertEquals(studentArgumentCaptor.getValue(),student);
     }
-
     @Test
     public void addStudentExceptie(){
         Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
 
         doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
-        
-        verify(studentRepository,times(1)).sa
 
         assertThrows(ExceptieStudentExisten.class, () ->{
             studentService.addStudent(student);
         });
     }
 
+    @Test
+    public void removeStudent(){
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.of(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        studentService.removeStudent("test@gmail.com");
+
+        verify(studentRepository,times(1)).removeStudentByEmail(studentField.capture());
+
+        assertEquals("test@gmail.com",studentField.getValue());
+    }
+    @Test
+    public void removeStudentExceptie() {
+        doReturn(Optional.empty()).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+        assertThrows(ExceptieStudentNeexistent.class, () ->{
+           studentService.removeStudent("test@gmail.com");
+        });
+    }
+
+    @Test
+    public void ordineNumeAsc() {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
+        Student student2 = Student.builder().prenume("Mihai").nume("Gona").varsta(21).email("fsdfs@fd.com").parola("toto12").build();
+        Student student3 = Student.builder().prenume("Jan").nume("Dobrea").varsta(20).email("55gg@fdasd.com").parola("toto12").build();
+        Student student4 = Student.builder().prenume("Daniel").nume("Mic").varsta(27).email("ddasdan@gamil.ro").parola("toto12").build();
+        Student student5 = Student.builder().prenume("George").nume("Ion").varsta(24).email("zor1400@gmail.com").parola("toto12").build();
+
+        List<Student> students = new ArrayList<>();
+
+        students.add(student);
+        students.add(student2);
+        students.add(student3);
+        students.add(student4);
+        students.add(student5);
 
 
+        Collections.sort(students);
+        doReturn(Optional.of(students)).when(studentRepository).getStudentsOrderByNameAsc();
+        studentService.ordineNumeAsc();
 
+        assertEquals(student3, students.get(0));
+    }
+    @Test
+    public void ordineNumeAscExceptie(){
+        List<Student> students = new ArrayList<>();
+
+        doReturn(Optional.of(students)).when(studentRepository).getStudentsOrderByNameAsc();
+
+        assertThrows(ExceptieStudentDBEmpty.class, () ->{
+           studentService.ordineNumeAsc();
+        });
+    }
+
+    @Test
+    public void  ordineNumeDesc() {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("dsadas@dasd.com").parola("toto12").build();
+        Student student2 = Student.builder().prenume("Mihai").nume("Gona").varsta(21).email("fsdfs@fd.com").parola("toto12").build();
+        Student student3 = Student.builder().prenume("Jan").nume("Dobrea").varsta(20).email("55gg@fdasd.com").parola("toto12").build();
+        Student student4 = Student.builder().prenume("Daniel").nume("Mic").varsta(27).email("ddasdan@gamil.ro").parola("toto12").build();
+        Student student5 = Student.builder().prenume("George").nume("Ion").varsta(24).email("zor1400@gmail.com").parola("toto12").build();
+
+        List<Student> students = new ArrayList<>();
+
+        students.add(student);
+        students.add(student2);
+        students.add(student3);
+        students.add(student4);
+        students.add(student5);
+
+
+        Collections.sort(students, new StudentComparatorNumeDesc());
+
+        doReturn(Optional.of(students)).when(studentRepository).getStudentsOrderByNameDesc();
+        studentService.ordineNumeDesc();
+
+        assertEquals(student4, students.get(0));
+    }
+    @Test
+    public void ordineNumeDescExceptie(){
+        List<Student> students = new ArrayList<>();
+
+        doReturn(Optional.of(students)).when(studentRepository).getStudentsOrderByNameDesc();
+
+        assertThrows(ExceptieStudentDBEmpty.class, () ->{
+            studentService.ordineNumeDesc();
+        });
+    }
+
+    @Test
+    public void updateStudentEmail() {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+
+        doReturn(Optional.ofNullable(student)).when(studentRepository).findStudentByEmail("test@gmail.com");
+
+//        studentService.updateStudentEmail("pocpoc","test@gmail.com");
+        studentRepository.updateStudentEmail("pocpoc","test@gmail.com");
+
+        verify(studentRepository).saveAndFlush(studentArgumentCaptor.capture());
+
+        verify(studentRepository).save(studentArgumentCaptor.capture());
+
+        assertEquals(studentArgumentCaptor.getValue().getEmail(),student.getEmail());
+    }
 }

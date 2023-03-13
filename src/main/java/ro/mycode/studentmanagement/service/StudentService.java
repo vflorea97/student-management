@@ -43,7 +43,7 @@ public class StudentService {
     @Transactional
     public void addStudent(Student student) throws ExceptieStudentExisten {
         Optional<Student> student1 = studentRepository.findStudentByEmail(student.getEmail());
-        if (student1.equals(Optional.empty())){
+        if (student1.isEmpty()){
             studentRepository.saveAndFlush(student);
         }else{
             throw new ExceptieStudentExisten();
