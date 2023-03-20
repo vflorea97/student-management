@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ro.mycode.studentmanagement.dto.StudentDTO;
 import ro.mycode.studentmanagement.model.Student;
 import ro.mycode.studentmanagement.service.StudentService;
 
@@ -46,6 +47,8 @@ class StudentResourceTest {
     }
     @Captor
     ArgumentCaptor<Student> studentArgumentCaptor;
+    @Captor
+    ArgumentCaptor<StudentDTO> studentDTOArgumentCaptor;
 
     @Test
     public void getAllStudents() throws Exception {
@@ -150,12 +153,28 @@ class StudentResourceTest {
     public void remove() throws Exception {
         Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
 
-        restMockMvc.perform(delete("/api/v1/student/remove")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(mapper.)
-                .andExpect(status().isOk())
-                .andExpect(content().string("Ai sters cu succes un student"));
+        restMockMvc.perform(delete("/api/v1/student/remove?email=test@gmail.com")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().string("Ai sters cu succes un student"))
+                .andExpect(status().isOk());
 
+        assertEquals(Optional.empty(), studentService.getStudentByEmail("test@gmail.com"));
+    }
+
+    @Test
+    public void update() throws Exception {
+        Student student = Student.builder().prenume("Alex").nume("Marian").varsta(23).email("test@gmail.com").parola("toto12").build();
+        StudentDTO studentDTO = new StudentDTO(1L,"Popa","popa@gmail.com","pocpoc12");
+
+        restMockMvc.perform(put("/api/v1/student/update")
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(mapper.writeValueAsBytes(studentDTO)))
+                .andExpect(content().string("Ai updata atributul cu succes"))
+                .andExpect(status().isOk());
+
+        verify(studentService, times(1)).updateStudent(studentDTOArgumentCaptor.capture());
+
+        assertEquals(studentDTOArgumentCaptor.getValue(), studentDTO);
     }
 
 
