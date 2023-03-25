@@ -74,6 +74,5 @@ public class StudentResource {
         log.info("REST request to update student{}", studentDTO);
         studentService.updateStudent(studentDTO);
         return new ResponseEntity<>("Ai updata atributul cu succes", HttpStatus.OK);
-
     }
 }
